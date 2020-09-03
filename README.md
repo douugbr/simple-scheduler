@@ -6,6 +6,7 @@ Made with flask.
 # Usage
 
 ``cd qr-rick-roll``
+
 ``flask run``
 
 Then it should start a local web server that generates different qrcodes everytime you reload it.
