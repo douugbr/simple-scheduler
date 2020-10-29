@@ -7,21 +7,28 @@
 {% endblock %}
 
 {% block body %}
-  <h1 class="text-center"> {{ event['name'] }} </h1>
+  <h1 class="text-center"> Notas | {{ event['name'] }} </h1>
   <div class="row">
     <ul class="list-group col pr-0">
-        <a href="/scheduler/{{ event['id'] }}/notes" style="text-align-last: justify;" class="list-group-item row justify-content-between">
-          Anotações <span class="badge badge-primary badge-pill">14</span>
+
+      <form class="mb-6 row" method="POST">
+        <div class="input-group mb-3 mt-3 col p-0">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Nome do Evento</span>
+          </div>
+          <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
+          <div class="form-group mb-0 ml-3"> <!-- Date input -->
+            <input class="form-control" id="date" name="date" placeholder="DD/MM/YYYY" type="text"/>
+          </div>
+          <button type="submit" class="btn btn-outline-primary col ml-3">Adicionar</button>
+        </div>
+      </form>
+      {% for note in notes %}
+        <a href="/scheduler/{{ event['id'] }}/notes/{{ note['id'] }}" style="text-align-last: justify;" class="list-group-item row justify-content-between">
+          {{ note['name'] }}
         </a>
-        <a href="/scheduler/{{ event['id'] }}/calendar" style="text-align-last: justify;" class="list-group-item row justify-content-between">
-          Calendário <span class="badge badge-primary badge-pill">14</span>
-        </a>
-        <a href="/scheduler/{{ event['id'] }}/todolist" style="text-align-last: justify;" class="list-group-item row justify-content-between">
-          Afazeres <span class="badge badge-primary badge-pill">14</span>
-        </a>
-        <a href="/scheduler/{{ event['id'] }}/documents" style="text-align-last: justify;" class="list-group-item row justify-content-between">
-          Documentos <span class="badge badge-primary badge-pill">14</span>
-        </a>
+        <form method="POST"><button type="submit" class="btn btn-danger">Danger</button></form>
+      {% endfor %}
     </ul>
   </div>
 {% endblock %}

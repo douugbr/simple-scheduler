@@ -42,9 +42,16 @@
         
       </form>
       {% for event in events %}
-        <a href="/scheduler/{{ event['id'] }}" class="list-group-item row justify-content-between">
+      <div class="mb-6 row">
+        <a href="/scheduler/{{ event['id'] }}" class="list-group-item row col ml-0 mr-3">
           <span class="col-4">{{ event['name'] }}</span>
-          <span class="col-4">{{ event['date'].strftime('%d/%m/%Y') }}</span></a>
+          <span class="col-4">{{ event['date'].strftime('%d/%m/%Y') }}</span>
+        </a>
+        <form action="{{ url_for('remove_event') }}" class="col-md-auto p-0" method="POST">
+          <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
+          <button type="submit" class="btn btn-outline-danger h-3 pb-3 pt-3">Remover</button>
+        </form>
+      </div>
       {% endfor %}
     </div>
   </div>

@@ -6,3 +6,6 @@ from datetime import date
 class AddEventForm(Form):
     name = StringField('name', [validators.Length(min=2, max=50)])
     date = DateField('date', format='%d/%m/%Y')
+
+class RemoveEventForm(Form):
+    eventid = StringField('eventid')
