@@ -11,6 +11,6 @@ class Secrets():
         if os.getenv('PRODUCTION') == 'True':
             self.SQLALCHEMY_DATABASE_URI = str(os.getenv('DATABASE_URL'))
         else:
-            self.SQLALCHEMY_DATABASE_URI = 'http://localhost:5432/'
+            self.SQLALCHEMY_DATABASE_URI = 'postgres://postgres:172839456@localhost:5432/schedulerdb'
 
         self.SECRET_KEY = os.getenv("SECRET_KEY")

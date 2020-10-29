@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block css_import %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+  <h1 class="text-center"> {{ event['name'] }} </h1>
+  <div class="row">
+    <ul class="list-group col pr-0">
+        <a href="/scheduler/{{ event['id'] }}/notes" style="text-align-last: justify;" class="list-group-item row justify-content-between">
+          Anotações <span class="badge badge-primary badge-pill">14</span>
+        </a>
+        <a href="/scheduler/{{ event['id'] }}/calendar" style="text-align-last: justify;" class="list-group-item row justify-content-between">
+          Calendário <span class="badge badge-primary badge-pill">14</span>
+        </a>
+        <a href="/scheduler/{{ event['id'] }}/todolist" style="text-align-last: justify;" class="list-group-item row justify-content-between">
+          Afazeres <span class="badge badge-primary badge-pill">14</span>
+        </a>
+        <a href="/scheduler/{{ event['id'] }}/documents" style="text-align-last: justify;" class="list-group-item row justify-content-between">
+          Documentos <span class="badge badge-primary badge-pill">14</span>
+        </a>
+    </ul>
+  </div>
+{% endblock %}
