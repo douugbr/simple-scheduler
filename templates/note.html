@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block css_import %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+  <form class="form-group" method="POST">
+    <div class="input-group input-group-lg mb-6">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="inputGroup-sizing-lg">Título</span>
+      </div>
+      <input type="text" name="name" value="{{ note['name'] }}" class="form-control" aria-label="name" aria-describedby="inputGroup-sizing-sm">
+    </div>
+    <h1></h1>
+    <div class="mt-6">
+      {% if not note['notes'] == None %}
+      <textarea name="notes" aria-label="Notes" class="form-control" id="exampleFormControlTextarea1" rows="10">{{ note['notes'] }}</textarea>
+      {% else %}
+      <textarea name="notes" aria-label="Notes" class="form-control" id="exampleFormControlTextarea1" rows="10"></textarea>
+      {% endif %}
+    </div>
+    <h1></h1>
+    <button type="submit" class="btn btn-outline-primary btn-lg btn-block">Atualizar</button>
+  </form>
+{% endblock %}

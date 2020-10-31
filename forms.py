@@ -16,3 +16,7 @@ class AddNoteForm(Form):
 class RemoveNoteForm(Form):
     eventid = StringField('eventid')
     notepadid = StringField('notepadid')
+
+class UpdateNoteForm(Form):
+    name = StringField('name', [validators.Length(min=2, max=50)])
+    notes = StringField('notes')

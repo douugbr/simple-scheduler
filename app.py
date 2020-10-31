@@ -4,8 +4,9 @@ from flask_oidc import OpenIDConnect
 from okta import UsersClient
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
+from wtforms import form
 from config import Secrets
-from forms import AddEventForm, RemoveEventForm, AddNoteForm, RemoveNoteForm
+from forms import AddEventForm, RemoveEventForm, AddNoteForm, RemoveNoteForm, UpdateNoteForm
 
 app = Flask(__name__)
 secrets = Secrets()
@@ -141,34 +142,65 @@ def remove_note():
 
 ### SHOW ONE NOTE
 
-@app.route('/scheduler/<event_id>/notes/<note_id>/edit')
+@app.route('/scheduler/<event_id>/notes/<note_id>/edit', methods=['GET', 'POST'])
 @oidc.require_login
-def event(event_id, note_id):
+def note(event_id, note_id):
     event = engine.execute('SELECT * FROM events WHERE id = %s', (int(event_id),)).fetchone()
     note = engine.execute('SELECT * FROM notepad WHERE id = %s', (int(note_id),)).fetchone()
+
+    form = UpdateNoteForm(request.form)
+    if not (event['userid'] == g.user.id):
+        abort(403)
+    if request.method == 'POST' and form.validate():
+        event_name = form.name.data
+        event_notes = form.notes.data
+        engine.execute('UPDATE notepad SET eventid = %s, name = %s, notes = %s WHERE id=%s;',
+                        (event_id, event_name, event_notes, note_id))
+        return redirect(url_for('.notes', event_id=event_id))
+
     if not (event['userid'] == g.user.id):
         abort(403)
     context = {
         'event': event,
         'note': note
     }
-    return render_template('event.html', **context)
+
+    return render_template('note.html', **context)
+
+
+### SHOW ALL TODOLIST
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### LOGIN AND LOGOUT
+
 
 @app.route("/login")
 @oidc.require_login
 def login():
     return redirect(url_for(".dashboard"))
 
-# @app.route("/files")
-# def files():
-#     return render_template('drive.html')
-
 @app.route("/logout")
 def logout():
     oidc.logout()
     return redirect(url_for(".index"))
 
-# ERRORS
+
+### ERRORS
+
 
 @app.errorhandler(403)
 def custom_403(error):
