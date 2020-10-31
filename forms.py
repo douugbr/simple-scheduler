@@ -20,3 +20,10 @@ class RemoveNoteForm(Form):
 class UpdateNoteForm(Form):
     name = StringField('name', [validators.Length(min=2, max=50)])
     notes = StringField('notes')
+
+class AddTodolistForm(Form):
+    name = StringField('name', [validators.Length(min=2, max=50)])
+
+class RemoveTodolistForm(Form):
+    eventid = StringField('eventid')
+    todolist = StringField('todolistid')

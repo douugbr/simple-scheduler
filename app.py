@@ -6,7 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from wtforms import form
 from config import Secrets
-from forms import AddEventForm, RemoveEventForm, AddNoteForm, RemoveNoteForm, UpdateNoteForm
+from forms import AddEventForm, AddNoteForm, UpdateNoteForm, AddTodolistForm
+from forms import RemoveEventForm, RemoveNoteForm, RemoveTodolistForm
 
 app = Flask(__name__)
 secrets = Secrets()
@@ -100,7 +101,9 @@ def event(event_id):
     }
     return render_template('event.html', **context)
 
+
 ### SHOW ALL NOTES
+
 
 @app.route('/scheduler/<event_id>/notes', methods=['GET', 'POST'])
 @oidc.require_login
@@ -121,7 +124,9 @@ def notes(event_id):
     }
     return render_template('notes.html', **context)
 
+
 ### REMOVE ONE NOTE
+
 
 @app.route("/removenote",  methods=['POST'])
 @oidc.require_login
@@ -140,7 +145,9 @@ def remove_note():
     
     return abort(404)
 
+
 ### SHOW ONE NOTE
+
 
 @app.route('/scheduler/<event_id>/notes/<note_id>/edit', methods=['GET', 'POST'])
 @oidc.require_login
@@ -171,6 +178,29 @@ def note(event_id, note_id):
 ### SHOW ALL TODOLIST
 
 
+@app.route('/scheduler/<event_id>/todolist', methods=['GET', 'POST'])
+@oidc.require_login
+def todolist(event_id):
+    event = engine.execute('SELECT * FROM events WHERE id = %s', (int(event_id),)).fetchone()
+    todolist = engine.execute('SELECT * FROM todolist WHERE eventid = %s', (int(event_id),)).fetchall()
+
+    if not (event['userid'] == g.user.id):
+        abort(403)
+
+    form = AddTodolistForm(request.form)
+    if request.method == 'POST' and form.validate():
+        event_name = form.name.data
+        print(event_name)
+        engine.execute('INSERT INTO todolist (item, eventid, completed) VALUES (%s, %s, %s);',
+                        (event_name, event_id, False))
+
+        return redirect(url_for('.todolist', event_id=event_id))
+
+    context = {
+        'event': event,
+        'todolist': todolist
+    }
+    return render_template('todolist.html', **context)
 
 
 
