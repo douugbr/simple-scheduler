@@ -9,3 +9,10 @@ class AddEventForm(Form):
 
 class RemoveEventForm(Form):
     eventid = StringField('eventid')
+
+class AddNoteForm(Form):
+    name = StringField('name', [validators.Length(min=2, max=50)])
+
+class RemoveNoteForm(Form):
+    eventid = StringField('eventid')
+    notepadid = StringField('notepadid')

@@ -48,7 +48,7 @@
           <span class="col-4">{{ event['date'].strftime('%d/%m/%Y') }}</span>
         </a>
         <form action="{{ url_for('remove_event') }}" class="col-md-auto p-0" method="POST">
-          <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
+          <input type="hidden" name="eventid" aria-label="Eventidg" value="{{ event['id'] }}">
           <button type="submit" class="btn btn-outline-danger h-3 pb-3 pt-3">Remover</button>
         </form>
       </div>

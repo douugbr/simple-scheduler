@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block css_import %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+  <h1 class="text-center">Suas Anotações | {{ event['name'] }}</h1>
+  <div class="row">
+    <div class="list-group col pr-0">
+      <form class="mb-6 row" method="POST">
+        <div class="input-group mb-3 mt-3 col p-0">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Nome da Anotação</span>
+          </div>
+          <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
+          <button type="submit" class="btn btn-outline-primary col ml-3">Adicionar</button>
+        </div>
+      </form>
+      {% for note in notes %}
+      <div class="mb-6 row">
+        <a href="/scheduler/{{ event['id'] }}/notes/{{ note['id'] }}/edit" class="list-group-item row col ml-0 mr-3">
+          <span class="col-4">{{ note['name'] }}</span>
+        </a>
+        <form action="{{ url_for('remove_note') }}" class="col-md-auto p-0" method="POST">
+          <input type="hidden" name="notepadid" aria-label="Notepadid" value="{{ note['id'] }}">
+          <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
+          <button type="submit" class="btn btn-outline-danger h-3 pb-3 pt-3">Remover</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

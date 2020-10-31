@@ -5,7 +5,7 @@ from okta import UsersClient
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from config import Secrets
-from forms import AddEventForm, RemoveEventForm
+from forms import AddEventForm, RemoveEventForm, AddNoteForm, RemoveNoteForm
 
 app = Flask(__name__)
 secrets = Secrets()
@@ -33,12 +33,12 @@ def before_request():
 def index():
     return render_template("index.html")
 
+### SHOW ALL EVENTS
 
 @app.route("/scheduler",  methods=['GET', 'POST'])
 @oidc.require_login
 def dashboard():
     form = AddEventForm(request.form)
-    r_form = RemoveEventForm(request.form)
     if request.method == 'POST' and form.validate():
         event_name = form.name.data
         event_date = str(form.date.data)
@@ -51,18 +51,36 @@ def dashboard():
     }
     return render_template("dashboard.html", form=form, **context)
 
+### REMOVE ONE EVENT
+
 @app.route("/removeevent",  methods=['POST'])
 @oidc.require_login
 def remove_event():
     r_form = RemoveEventForm(request.form)
+    if request.method != 'POST':
+        abort(405)
     if request.method == 'POST' and r_form.validate():
-        if not (engine.execute('SELECT userid FROM events WHERE id = %s', (r_form.eventid.data,)).fetchone()['userid'] == g.user.id):
+        if not (engine.execute('SELECT userid FROM events WHERE id = %s',
+         (r_form.eventid.data,)).fetchone()['userid'] == g.user.id):
             abort(403)
         engine.execute('DELETE FROM events WHERE id = %s;',
                         (r_form.eventid.data))
+        
+        # I forgot to add cascade delete so.....
+        engine.execute('DELETE FROM notepad WHERE eventid = %s;',
+                        (r_form.eventid.data))
+        
+        engine.execute('DELETE FROM calendar WHERE eventid = %s;',
+                        (r_form.eventid.data))
+        
+        engine.execute('DELETE FROM todolist WHERE eventid = %s;',
+                        (r_form.eventid.data))
+
         return redirect(url_for('.dashboard'))
     
     return abort(404)
+
+### SHOW ONE EVENT
 
 @app.route('/scheduler/<event_id>')
 @oidc.require_login
@@ -81,19 +99,60 @@ def event(event_id):
     }
     return render_template('event.html', **context)
 
-@app.route('/scheduler/<event_id>/notes')
+### SHOW ALL NOTES
+
+@app.route('/scheduler/<event_id>/notes', methods=['GET', 'POST'])
 @oidc.require_login
 def notes(event_id):
     event = engine.execute('SELECT * FROM events WHERE id = %s', (int(event_id),)).fetchone()
     notes = engine.execute('SELECT * FROM notepad WHERE eventid = %s', (int(event_id),)).fetchall()
     if not (event['userid'] == g.user.id):
         abort(403)
+    form = AddNoteForm(request.form)
+    if request.method == 'POST' and form.validate():
+        event_name = form.name.data
+        engine.execute('INSERT INTO notepad (name, eventid) VALUES (%s, %s);',
+                        (event_name, event_id))
+        return redirect(url_for('.notes', event_id=event_id))
     context = {
         'event': event,
         'notes': notes
     }
-    return render_template('event.html', **context)
+    return render_template('notes.html', **context)
 
+### REMOVE ONE NOTE
+
+@app.route("/removenote",  methods=['POST'])
+@oidc.require_login
+def remove_note():
+    r_form = RemoveNoteForm(request.form)
+    if request.method != 'POST':
+        abort(405)
+    if request.method == 'POST' and r_form.validate():
+        if not (engine.execute('SELECT userid FROM events WHERE id = %s',
+         (r_form.eventid.data,)).fetchone()['userid'] == g.user.id):
+            abort(403)
+        engine.execute('DELETE FROM notepad WHERE id = %s;',
+                        (r_form.notepadid.data))
+
+        return redirect(url_for('.notes', event_id=r_form.eventid.data))
+    
+    return abort(404)
+
+### SHOW ONE NOTE
+
+@app.route('/scheduler/<event_id>/notes/<note_id>/edit')
+@oidc.require_login
+def event(event_id, note_id):
+    event = engine.execute('SELECT * FROM events WHERE id = %s', (int(event_id),)).fetchone()
+    note = engine.execute('SELECT * FROM notepad WHERE id = %s', (int(note_id),)).fetchone()
+    if not (event['userid'] == g.user.id):
+        abort(403)
+    context = {
+        'event': event,
+        'note': note
+    }
+    return render_template('event.html', **context)
 
 @app.route("/login")
 @oidc.require_login
@@ -123,7 +182,7 @@ def custom_403(error):
 
 
 @app.errorhandler(404)
-def custom_401(error):
+def custom_404(error):
     return Response(
         '''
         <body style="background-color: black">
@@ -131,3 +190,13 @@ def custom_401(error):
             <h2 style="text-align:center; font-family: Arial; color:white">Página não encontrada.</h3>
         </body>
         ''', 404)
+
+@app.errorhandler(405)
+def custom_405(error):
+    return Response(
+        '''
+        <body style="background-color: black">
+            <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/405">
+            <h2 style="text-align:center; font-family: Arial; color:white">Apenas requests POST são permitidos aqui.</h3>
+        </body>
+        ''', 405)
