@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from wtforms import form
 from config import Secrets
-from forms import AddEventForm, AddNoteForm, UpdateNoteForm, AddTodolistForm
+from forms import AddEventForm, AddNoteForm, UpdateNoteForm, AddTodolistForm, UpdateTodolistForm
 from forms import RemoveEventForm, RemoveNoteForm, RemoveTodolistForm
 
 app = Flask(__name__)
@@ -178,9 +178,9 @@ def note(event_id, note_id):
 ### SHOW ALL TODOLIST
 
 
-@app.route('/scheduler/<event_id>/todolist', methods=['GET', 'POST'])
+@app.route('/scheduler/<event_id>/todolists', methods=['GET', 'POST'])
 @oidc.require_login
-def todolist(event_id):
+def todolists(event_id):
     event = engine.execute('SELECT * FROM events WHERE id = %s', (int(event_id),)).fetchone()
     todolist = engine.execute('SELECT * FROM todolist WHERE eventid = %s', (int(event_id),)).fetchall()
 
@@ -194,26 +194,56 @@ def todolist(event_id):
         engine.execute('INSERT INTO todolist (item, eventid, completed) VALUES (%s, %s, %s);',
                         (event_name, event_id, False))
 
-        return redirect(url_for('.todolist', event_id=event_id))
+        return redirect(url_for('.todolists', event_id=event_id))
 
     context = {
         'event': event,
         'todolist': todolist
     }
-    return render_template('todolist.html', **context)
+    return render_template('todolists.html', **context)
 
 
+### REMOVE ONE TODOLIST
 
 
+@app.route("/removetodolist",  methods=['POST'])
+@oidc.require_login
+def remove_todolist():
+    r_form = RemoveTodolistForm(request.form)
+    if request.method != 'POST':
+        abort(405)
+    if request.method == 'POST' and r_form.validate():
+        if not (engine.execute('SELECT userid FROM events WHERE id = %s',
+         (r_form.eventid.data,)).fetchone()['userid'] == g.user.id):
+            abort(403)
+        engine.execute('DELETE FROM todolist WHERE id = %s;',
+                        (r_form.todolistid.data))
+
+        return redirect(url_for('.todolists', event_id=r_form.eventid.data))
+    
+    return abort(404)
 
 
+### UPDATE TODOLIST
 
 
+@app.route('/scheduler/updatetodolist', methods=['POST'])
+@oidc.require_login
+def update_todolist():
 
+    form = UpdateTodolistForm(request.form)
+    if request.method != 'POST':
+        abort(405)
+    if request.method == 'POST' and form.validate():
+        if not (engine.execute('SELECT userid FROM events WHERE id = %s',
+         (form.eventid.data,)).fetchone()['userid'] == g.user.id):
+            abort(403)
 
+        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+        engine.execute('UPDATE todolist SET eventid = %s, item = %s, completed = %s WHERE id=%s;',
+                        (form.eventid.data, form.item.data,form.completed.data, form.todolistid.data))
 
-
-
+        return redirect(url_for('.todolists', event_id=form.eventid.data))
 
 ### LOGIN AND LOGOUT
 
@@ -259,6 +289,16 @@ def custom_405(error):
         '''
         <body style="background-color: black">
             <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/405">
-            <h2 style="text-align:center; font-family: Arial; color:white">Apenas requests POST são permitidos aqui.</h3>
+            <h2 style="text-align:center; font-family: Arial; color:white">Método HTTP não autorizado.</h3>
         </body>
         ''', 405)
+
+@app.errorhandler(500)
+def custom_500(error):
+    return Response(
+        '''
+        <body style="background-color: black">
+            <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/500">
+            <h2 style="text-align:center; font-family: Arial; color:white">O programador fez merda.</h3>
+        </body>
+        ''', 500)

@@ -9,21 +9,21 @@
     {% block css_import %}{% endblock %}
   </head>
   <body>
-    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-      <h5 class="my-0 mr-md-auto font-weight-normal">Simple Scheduler</h5>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3">
+      <h5 class="my-0 mr-md-auto font-weight-normal text-white">Simple Scheduler</h5>
       <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="/" title="Home">Início</a>
+        <a class="p-2 text-white" href="/" title="Home">Início</a>
         {% if not g.user %}
-          <a class="p-2 text-dark" href="/login">Log In / Registro</a>
+          <a class="p-2 text-white" href="/login">Log In / Registro</a>
         {% else %}
-          <a class="p-2 text-dark" href="/scheduler">Scheduler</a>
-          <a class="p-2 text-dark" href="/logout">Logout</a>
+          <a class="p-2 text-white" href="/scheduler">Meus Eventos</a>
+          <a class="p-2 text-white" href="/logout">Logout</a>
         {% endif %}
       </nav>
     </div>
     <div class="container">
       {% block body %}{% endblock %}
     </div>
-    <footer class="text-center">Criado com ❤️ na <a href="http://etecterezanunes.com.br">ETEC Tereza Nunes</a><!--sigam https://twitter.com/douugbr--></footer>
+    <footer class="text-center">Criado com ❤️ na <a class="etec" href="http://etecterezanunes.com.br">ETEC Tereza Nunes</a><!--sigam https://twitter.com/douugbr--></footer>
   </body>
 </html>

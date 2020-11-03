@@ -16,18 +16,18 @@
             <span class="input-group-text" id="basic-addon1">Nome da Anotação</span>
           </div>
           <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
-          <button type="submit" class="btn btn-outline-primary col ml-3">Adicionar</button>
+          <button type="submit" class="btn btn-primary col ml-3">Adicionar</button>
         </div>
       </form>
       {% for note in notes %}
-      <div class="mb-6 row">
-        <a href="/scheduler/{{ event['id'] }}/notes/{{ note['id'] }}/edit" class="list-group-item row col ml-0 mr-3">
-          <span class="col-4">{{ note['name'] }}</span>
+      <div class="row">
+        <a href="/scheduler/{{ event['id'] }}/notes/{{ note['id'] }}/edit" class="list-group-item col-sm-10">
+          <span class="">{{ note['name'] }}</span>
         </a>
-        <form action="{{ url_for('remove_note') }}" class="col-md-auto p-0" method="POST">
+        <form action="{{ url_for('remove_note') }}" class="col-sm-2 pl-3 pr-0 align-items-center container d-flex" method="POST">
           <input type="hidden" name="notepadid" aria-label="Notepadid" value="{{ note['id'] }}">
           <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
-          <button type="submit" class="btn btn-outline-danger h-3 pb-3 pt-3">Remover</button>
+          <button type="submit" class="btn btn-danger col align-self-center">Remover</button>
         </form>
       </div>
       {% endfor %}

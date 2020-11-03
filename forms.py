@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, validators
+from wtforms import Form, StringField, validators, BooleanField
 from wtforms.validators import DataRequired
 from wtforms.fields.html5 import DateField
 from datetime import date
@@ -26,4 +26,10 @@ class AddTodolistForm(Form):
 
 class RemoveTodolistForm(Form):
     eventid = StringField('eventid')
-    todolist = StringField('todolistid')
+    todolistid = StringField('todolistid')
+
+class UpdateTodolistForm(Form):
+    item = StringField('item', [validators.Length(min=2, max=50)])
+    eventid = StringField('eventid')
+    todolistid = StringField('todolistid')
+    completed = BooleanField('completed')

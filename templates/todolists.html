@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block css_import %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+<script language="JavaScript">
+  window.onload = function () {
+  {% for item in todolist %}
+    document.getElementById('input'+{{ loop.index }}).addEventListener("load", strike({{ loop.index }}));
+  {% endfor %}
+  }
+  function strike(index)
+  {
+    var ipt = document.getElementById('input'+index)
+    if (document.getElementById('box'+index).checked === false)
+    {
+      ipt.style.setProperty("text-decoration", "none");
+    }
+    else 
+    {
+      ipt.style.setProperty("text-decoration", "line-through");
+    }
+  }
+
+  function submit_form(index) {
+    var ipt = document.getElementById('input'+index)
+    console.log(ipt)
+    document.getElementById('hiddeninput'+index).value = ipt.value;
+    document.getElementById('updateform'+index).submit()
+  }
+  
+</script>
+{% endblock %}
+
+{% block body %}
+  <h1 class="text-center"> Afazeres | {{ event['name'] }} </h1>
+  <div class="row">
+    <ul class="list-group col pr-0">
+
+      <form class="mb-6 row" method="POST">
+        <div class="input-group mb-3 mt-3 col p-0">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Nome da Tarefa</span>
+          </div>
+          <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
+          <button type="submit" class="btn btn-primary col ml-3">Adicionar</button>
+        </div>
+      </form>
+      {% for item in todolist %}
+      <form id="updateform{{ loop.index }}" action="{{ url_for('update_todolist') }}" method="POST"></form>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <input form="updateform{{ loop.index }}" type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
+            <input form="updateform{{ loop.index }}" type="hidden" name="todolistid" aria-label="Todolistid" value="{{ item['id'] }}">
+            <input form="updateform{{ loop.index }}" id="hiddeninput{{ loop.index }}" type="hidden" name="item" aria-label="Item" value="">
+            <input form="updateform{{ loop.index }}" id="box{{ loop.index }}" name="completed" type="checkbox" onclick="strike({{ loop.index }})"  aria-label="Checkbox for following text input" {% if item['completed'] == True %} checked {% endif %}>
+          </div>
+        </div>
+        <input id="input{{ loop.index }}" type="text" class="form-control" value="{{ item['item'] }}" aria-label="Text input with checkbox">
+        <form action="{{ url_for('remove_todolist') }}" method="POST">
+          <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
+          <input type="hidden" name="todolistid" aria-label="Todolistid" value="{{ item['id'] }}">
+          <button type="submit" class="ml-3 btn btn-danger">Remover</button>
+        </form>
+        <button type="button" class="ml-3 btn btn-primary" onclick="submit_form({{ loop.index }})" form="updateform{{ loop.index }}">Atualizar</button>
+      </div>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
