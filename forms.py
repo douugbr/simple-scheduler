@@ -33,3 +33,17 @@ class UpdateTodolistForm(Form):
     eventid = StringField('eventid')
     todolistid = StringField('todolistid')
     completed = BooleanField('completed')
+
+class AddCalendarForm(Form):
+    eventid = StringField('eventid')
+    name = StringField('name', [validators.Length(min=2, max=50)])
+    date = DateField('date', format='%d/%m/%Y')
+
+class UpdateCalendarForm(Form):
+    eventid = StringField('eventid')
+    name = StringField('name', [validators.Length(min=2, max=50)])
+    date = DateField('date', format='%d/%m/%Y')
+
+class RemoveCalendarForm(Form):
+    eventid = StringField('eventid')
+    calendarid = StringField('calendarid')

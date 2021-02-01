@@ -25,13 +25,13 @@
 {% endblock %}
 
 {% block body %}
-  <h1 class="text-center">Your Events</h1>
+  <h1 class="text-center">Calendar | {{ event['name'] }}</h1>
   <div class="row">
     <div class="col pr-0">
       <form class="mb-6 row" method="POST">
         <div class="input-group mb-3 mt-3 col p-0">
           <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Event Name</span>
+            <span class="input-group-text" id="basic-addon1">Name</span>
           </div>
           <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
           <div class="form-group mb-0 ml-3"> <!-- Date input -->
@@ -42,18 +42,17 @@
         
       </form>
       <div class="d-inline-flex list-group-flush flex-column w-100">
-        {% for event in events %}
+        {% for calendar in calendars %}
         <div class="row">
-          <a href="/scheduler/{{ event['id'] }}" class="list-group-item col-sm-10">
-            <span class="mr-5">{{ event['name'] }}</span>
-            <span class="ml-7">{{ event['date'].strftime('%d/%m/%Y') }}</span>
+          <a href="/scheduler/{{ calendar['id'] }}" class="list-group-item col-sm-10">
+            <span class="mr-5">{{ calendar['name'] }}</span>
+            <span class="ml-7">{{ calendar['date'].strftime('%d/%m/%Y') }}</span>
           </a>
-          <form action="{{ url_for('remove_event') }}" class="col-sm-2 pl-3 pr-0 align-items-center container d-flex" method="POST">
-            <input type="hidden" name="eventid" aria-label="Eventidg" value="{{ event['id'] }}">
+          <form action="{{ url_for('remove_calendar') }}" class="col-sm-2 pl-3 pr-0 align-items-center container d-flex" method="POST">
+            <input type="hidden" name="eventid" aria-label="Eventidg" value="{{ calendar['id'] }}">
             <button type="submit" class="btn btn-danger col align-self-center">Remove</button>
           </form>
         </div>
-        
         {% endfor %}
       </div>
     </div>

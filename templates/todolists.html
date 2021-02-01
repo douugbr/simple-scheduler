@@ -34,17 +34,17 @@
 {% endblock %}
 
 {% block body %}
-  <h1 class="text-center"> Afazeres | {{ event['name'] }} </h1>
+  <h1 class="text-center"> Todos | {{ event['name'] }} </h1>
   <div class="row">
     <ul class="list-group col pr-0">
 
       <form class="mb-6 row" method="POST">
         <div class="input-group mb-3 mt-3 col p-0">
           <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Nome da Tarefa</span>
+            <span class="input-group-text" id="basic-addon1">Name</span>
           </div>
           <input type="text" class="form-control rounded-right col w-50" aria-label="Name" name="name" aria-describedby="basic-addon1">
-          <button type="submit" class="btn btn-primary col ml-3">Adicionar</button>
+          <button type="submit" class="btn btn-primary col ml-3">Add</button>
         </div>
       </form>
       {% for item in todolist %}
@@ -62,9 +62,9 @@
         <form action="{{ url_for('remove_todolist') }}" method="POST">
           <input type="hidden" name="eventid" aria-label="Eventid" value="{{ event['id'] }}">
           <input type="hidden" name="todolistid" aria-label="Todolistid" value="{{ item['id'] }}">
-          <button type="submit" class="ml-3 btn btn-danger">Remover</button>
+          <button type="submit" class="ml-3 btn btn-danger">Remove</button>
         </form>
-        <button type="button" class="ml-3 btn btn-primary" onclick="submit_form({{ loop.index }})" form="updateform{{ loop.index }}">Atualizar</button>
+        <button type="button" class="ml-3 btn btn-primary" onclick="submit_form({{ loop.index }})" form="updateform{{ loop.index }}">Update</button>
       </div>
       {% endfor %}
     </ul>

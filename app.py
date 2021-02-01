@@ -91,8 +91,11 @@ def event(event_id):
     todo_count = engine.execute('SELECT COUNT(*) FROM todolist WHERE eventid = %s;', (event_id,)).fetchone()
     notes_count = engine.execute('SELECT COUNT(*) FROM notepad WHERE eventid = %s;', (event_id,)).fetchone()
     dates_count = engine.execute('SELECT COUNT(*) FROM calendar WHERE eventid = %s;', (event_id,)).fetchone()
-    if not (event['userid'] == g.user.id):
+    if event is None:
         abort(403)
+    else:
+        if not (event['userid'] == g.user.id):
+            abort(403)
     context = {
         'event': event,
         'todo_count': todo_count,
@@ -189,10 +192,9 @@ def todolists(event_id):
 
     form = AddTodolistForm(request.form)
     if request.method == 'POST' and form.validate():
-        event_name = form.name.data
-        print(event_name)
+        todolist_name = form.name.data
         engine.execute('INSERT INTO todolist (item, eventid, completed) VALUES (%s, %s, %s);',
-                        (event_name, event_id, False))
+                        (todolist_name, event_id, False))
 
         return redirect(url_for('.todolists', event_id=event_id))
 
@@ -238,12 +240,33 @@ def update_todolist():
         if not (engine.execute('SELECT userid FROM events WHERE id = %s',
          (form.eventid.data,)).fetchone()['userid'] == g.user.id):
             abort(403)
-
-        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
         engine.execute('UPDATE todolist SET eventid = %s, item = %s, completed = %s WHERE id=%s;',
                         (form.eventid.data, form.item.data,form.completed.data, form.todolistid.data))
 
         return redirect(url_for('.todolists', event_id=form.eventid.data))
+
+
+### SHOW ALL CALENDARS
+
+
+@app.route("/scheduler",  methods=['GET', 'POST'])
+@oidc.require_login
+def calendar():
+    form = AddEventForm(request.form)
+    if request.method == 'POST' and form.validate():
+        event_name = form.name.data
+        event_date = str(form.date.data)
+        engine.execute('INSERT INTO calendar (name, date, userid) VALUES (%s, %s, %s);',
+                        (event_name, event_date, g.user.id))
+        return redirect(url_for('.calendar'))
+    db_events = engine.execute('SELECT name, id, date FROM events WHERE userid = %s', (g.user.id,)).fetchall()
+    context = {
+        'events': db_events
+    }
+    return render_template("calendar.html", form=form, **context)
+
+
+
 
 ### LOGIN AND LOGOUT
 
@@ -259,6 +282,14 @@ def logout():
     return redirect(url_for(".index"))
 
 
+### MY DRIVE
+
+
+@app.route('/mydrive', methods=['GET'])
+def mydrive():
+    return redirect('https://docs.google.com/document/u/0/')
+
+
 ### ERRORS
 
 
@@ -268,7 +299,7 @@ def custom_403(error):
         '''
         <body style="background-color: black">
             <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/403">
-            <h2 style="text-align:center; font-family: Arial; color:white">Você está tentando acessar um evento de outra pessoa.</h3>
+            <h2 style="text-align:center; font-family: Arial; color:white"></h3>
         </body>
         ''', 403)
 
@@ -279,7 +310,7 @@ def custom_404(error):
         '''
         <body style="background-color: black">
             <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/404">
-            <h2 style="text-align:center; font-family: Arial; color:white">Página não encontrada.</h3>
+            <h2 style="text-align:center; font-family: Arial; color:white"></h3>
         </body>
         ''', 404)
 
@@ -289,7 +320,7 @@ def custom_405(error):
         '''
         <body style="background-color: black">
             <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/405">
-            <h2 style="text-align:center; font-family: Arial; color:white">Método HTTP não autorizado.</h3>
+            <h2 style="text-align:center; font-family: Arial; color:white"></h3>
         </body>
         ''', 405)
 
@@ -299,6 +330,6 @@ def custom_500(error):
         '''
         <body style="background-color: black">
             <img style="display: block;margin-left: auto;margin-right: auto;width: 50%;" src="https://http.cat/500">
-            <h2 style="text-align:center; font-family: Arial; color:white">O programador fez merda.</h3>
+            <h2 style="text-align:center; font-family: Arial; color:white"></h3>
         </body>
         ''', 500)

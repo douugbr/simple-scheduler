@@ -10,13 +10,13 @@
   </head>
   <body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3">
-      <h5 class="my-0 mr-md-auto font-weight-normal text-white">Simple Scheduler</h5>
+      <h5 class="my-0 mr-md-auto font-weight-normal text-white">Simple Organizer</h5>
       <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-white" href="/" title="Home">Início</a>
+        <a class="p-2 text-white" href="/" title="Home">Home</a>
         {% if not g.user %}
-          <a class="p-2 text-white" href="/login">Log In / Registro</a>
+          <a class="p-2 text-white" href="/login">Log In / Register</a>
         {% else %}
-          <a class="p-2 text-white" href="/scheduler">Meus Eventos</a>
+          <a class="p-2 text-white" href="/scheduler">My Events</a>
           <a class="p-2 text-white" href="/logout">Logout</a>
         {% endif %}
       </nav>
@@ -24,6 +24,6 @@
     <div class="container">
       {% block body %}{% endblock %}
     </div>
-    <footer class="text-center">Criado com ❤️ na <a class="etec" href="http://etecterezanunes.com.br">ETEC Tereza Nunes</a><!--sigam https://twitter.com/douugbr--></footer>
+    <footer class="text-center">Created with ❤️ for <a class="etec" href="http://etecterezanunes.com.br">Harvard's CS50x</a><!--sigam https://twitter.com/douugbr--></footer>
   </body>
 </html>
