@@ -145,6 +145,10 @@ dmypy.json
 # profiling data
 .prof
 
+# secrets
 client_secrets.json
+
+# vscode
+.vscode
 
 # End of https://www.toptal.com/developers/gitignore/api/flask
