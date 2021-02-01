@@ -2,3 +2,5 @@ __pycache__
 *.pyc
 .vscode
 .env
+client_secrets.json
+/.env
